@@ -82,7 +82,14 @@ docker load < petclinic.tar
 docker run -d -p 8081:8080 petclinic 
 ```
 
-The PetClinic Docker image is available on [DockerHub](https://hub.docker.com/r/carmineacanfora/petclinic) and it can be pulled and executed as follows:
+The PetClinic Docker image is available on Artifactory and it can be pulled and executed as follows:
+
+```
+docker pull carmineacanfora.jfrog.io/petclinic-docker/petclinic:latest
+docker run -d -p 8081:8080 carmineacanfora.jfrog.io/petclinic-docker/petclinic 
+```
+
+The PetClinic Docker image is also available on [DockerHub](https://hub.docker.com/r/carmineacanfora/petclinic) and it can be pulled and executed as follows:
 
 ```
 docker pull carmineacanfora/petclinic
