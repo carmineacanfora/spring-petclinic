@@ -74,7 +74,7 @@ The PetClinic application will be available at http://localhost:8081/
 
 ### Docker Image
 
-The Docker image of the PetClinic application can be saved, loaded on a different host and executed with the following commands:
+The Docker image of the PetClinic application can be saved, loaded on a different host, executed with the following commands:
 
 ```
 docker save petclinic > petclinic.tar
@@ -82,8 +82,9 @@ docker load < petclinic.tar
 docker run -d -p 8081:8080 petclinic 
 ```
 
-The PetClinic Docker image is available on [DockerHub](https://hub.docker.com/r/carmineacanfora/petclinic-docker) and it can be downloaded as follows:
+The PetClinic Docker image is available on [DockerHub](https://hub.docker.com/r/carmineacanfora/petclinic) and it can be pulled and executed as follows:
 
 ```
-docker pull carmineacanfora/petclinic-docker:latest
+docker pull carmineacanfora/petclinic
+docker run -d -p 8081:8080 carmineacanfora/petclinic 
 ```
