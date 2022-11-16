@@ -1,0 +1,23 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Build') {
+            steps {
+                // Get code from GitHub repo
+                git url: 'https://github.com/carmineacanfora/spring-petclinic', branch: 'main'
+                
+                // Compile code and run tests
+                sh "./mvnw package"
+            }
+        }
+        stage('Package') {
+            steps {
+                script {
+                    // Create Docker image
+                    docker.build "petclinic:latest"
+                }
+            }
+        }
+    }
+}
