@@ -40,13 +40,20 @@ on:
         type: string
         default: "carm-docker-all"
         description: "XRAY watch"
+      xr_fail_build:
+        required: true
+        type: choice
+        options:
+        - "false"
+        - "true"
+        description: "Set to false to not return the exit code 3, even if the 'Fail Build' rule is matched by Xray"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Output Inputs
+      - name: Print Inputs
         run: echo "${{ toJSON(github.event.inputs) }}"
       
       - name: Checkout
@@ -87,11 +94,11 @@ jobs:
       
       - name: Scan Docker Image for Vulnerabilities (project)
         if: ${{ github.event.inputs.xr_scan_type == 'project' }}
-        run: jf docker scan ${{ github.event.inputs.art_docker_registry }}${{ github.event.inputs.art_docker_image }} --project=${{ github.event.inputs.art_project }}
+        run: jf docker scan --fail=${{ github.event.inputs.xr_fail_build }} ${{ github.event.inputs.art_docker_registry }}${{ github.event.inputs.art_docker_image }} --project=${{ github.event.inputs.art_project }}
       
       - name: Scan Docker Image for Vulnerabilities (watch)
         if: ${{ github.event.inputs.xr_scan_type == 'watch' }}
-        run: jf docker scan ${{ github.event.inputs.art_docker_registry }}${{ github.event.inputs.art_docker_image }} --watches=${{ github.event.inputs.xr_watch }}
+        run: jf docker scan --fail=${{ github.event.inputs.xr_fail_build }} ${{ github.event.inputs.art_docker_registry }}${{ github.event.inputs.art_docker_image }} --watches=${{ github.event.inputs.xr_watch }}
       
       - name: Collect Environment Variables
         run: |
