@@ -20,6 +20,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v2
         with:
+          distribution: 'temurin'
           java-version: 1.8
 
       - name: Setup JFrog CLI
