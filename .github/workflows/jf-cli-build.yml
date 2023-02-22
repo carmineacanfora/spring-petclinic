@@ -24,7 +24,7 @@ jobs:
           java-version: '19.0.2+7'
           cache: 'maven'
       
-      - name: Setup Docker Buildx
+      - name: Setup Docker
         uses: docker/setup-buildx-action@v2
 
       - name: Setup JFrog CLI
@@ -46,6 +46,8 @@ jobs:
       - name: Build Docker Image
         uses: docker/build-push-action@v4
         with:
+          context: .
+          load: true
           tags: ${{ env.art_docker_registry }}${{ env.art_docker_image }}
       
       - name: Scan Docker Image for Vulnerabilities
