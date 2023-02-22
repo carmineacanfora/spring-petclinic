@@ -1,0 +1,62 @@
+name: "CI with Artifactory and XRAY"
+on: 
+  push:
+    branches: [ main ]
+env:
+  ART_SERVER_ID: soleng
+  ART_REPO_ID: carm-mvn-dev
+  ART_PROJECT: carm
+  ART_DOCKER_REGISTRY: soleng.jfrog.io/carm-docker-dev-local/
+  ART_DOCKER_IMAGE: petclinic:latest
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Setup JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: 1.8
+
+      - name: Setup JFrog CLI
+        uses: jfrog/setup-jfrog-cli@v3
+        with:
+          version: latest
+        env:
+          JF_ENV_1: ${{ secrets.JF_SECRET_ENV_1 }}
+          M2_HOME: /usr/local/apache-maven/apache-maven-3.9.0
+      
+      - name: Ping JFrog CLI
+        run: jf rt ping
+      
+      - name: Compile and Test
+        run: |
+          jf mvnc --server-id-resolve=$ART_SERVER_ID --server-id-deploy=$ART_SERVER_ID --repo-resolve-releases=$ART_REPO_ID --repo-resolve-snapshots=$ART_REPO_ID --repo-deploy-releases=$ART_REPO_ID --repo-deploy-snapshots=auto-$ART_REPO_ID
+          jf mvn clean install --project=${{ART_PROJECT}}
+      
+      - name: Build Docker Image
+        run: |
+          docker build . --file Dockerfile --tag ${{ART_DOCKER_REGISTRY}}${{ART_DOCKER_IMAGE}}
+      
+      - name: Scan Docker Image for Vulnerabilities
+        run: |
+          jf docker scan ${{ART_DOCKER_REGISTRY}}${{ART_DOCKER_IMAGE}} --project=${{ART_PROJECT}}
+      
+      - name: Collect Environment Variables
+        run: |
+          # Collect environment variables for the build
+          jf rt bce --project=${{ART_PROJECT}}
+          # Collect VCS details from git and add them to the build
+          jf rt bag
+      
+      - name: Push Image to Artifactory
+        run: |
+          jf docker push ${{ART_DOCKER_REGISTRY}}${{ART_DOCKER_IMAGE}} --server-id=$SERVER_ID --project=${{ART_PROJECT}}
+      
+      - name: Publish Build Info
+        run: |
+          jf rt bp --project=${{ART_PROJECT}}
