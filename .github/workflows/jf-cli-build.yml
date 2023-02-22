@@ -1,4 +1,4 @@
-name: "github-petclinic-docker"
+name: "github-ci-docker"
 on: 
   workflow_dispatch:
     inputs:
