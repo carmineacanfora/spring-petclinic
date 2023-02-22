@@ -22,6 +22,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '19.0.2+7'
+          cache: 'maven'
       
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v2
