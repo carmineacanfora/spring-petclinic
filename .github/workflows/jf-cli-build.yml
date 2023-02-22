@@ -3,11 +3,11 @@ on:
   push:
     branches: [ main ]
 env:
-  ART_SERVER_ID: soleng
-  ART_REPO_ID: carm-mvn-dev
-  ART_PROJECT: carm
-  ART_DOCKER_REGISTRY: soleng.jfrog.io/carm-docker-dev-local/
-  ART_DOCKER_IMAGE: petclinic:latest
+  art_server_id: soleng
+  art_repo_id: carm-mvn-dev
+  art_project: carm
+  art_docker_registry: soleng.jfrog.io/carm-docker-dev-local/
+  art_docker_image: petclinic:latest
 
 jobs:
   build:
@@ -35,28 +35,24 @@ jobs:
       
       - name: Compile and Test
         run: |
-          jf mvnc --server-id-resolve=$ART_SERVER_ID --server-id-deploy=$ART_SERVER_ID --repo-resolve-releases=$ART_REPO_ID --repo-resolve-snapshots=$ART_REPO_ID --repo-deploy-releases=$ART_REPO_ID --repo-deploy-snapshots=auto-$ART_REPO_ID
-          jf mvn clean install --project=${{ART_PROJECT}}
+          jf mvnc --server-id-resolve=${{ env.art_server_id }} --server-id-deploy=${{ env.art_server_id }} --repo-resolve-releases=${{ env.art_repo_id }} --repo-resolve-snapshots=${{ env.art_repo_id }} --repo-deploy-releases=${{ env.art_repo_id }} --repo-deploy-snapshots=auto-${{ env.art_repo_id }}
+          jf mvn clean install --project=${{ env.art_project }}
       
       - name: Build Docker Image
-        run: |
-          docker build . --file Dockerfile --tag ${{ART_DOCKER_REGISTRY}}${{ART_DOCKER_IMAGE}}
+        run: docker build . --file Dockerfile --tag ${{ env.art_docker_registry }}${{ env.art_docker_image }}
       
       - name: Scan Docker Image for Vulnerabilities
-        run: |
-          jf docker scan ${{ART_DOCKER_REGISTRY}}${{ART_DOCKER_IMAGE}} --project=${{ART_PROJECT}}
+        run: jf docker scan ${{ env.art_docker_registry }}${{ env.art_docker_image }} --project=${{ env.art_project }}
       
       - name: Collect Environment Variables
         run: |
           # Collect environment variables for the build
-          jf rt bce --project=${{ART_PROJECT}}
+          jf rt bce --project=${{ env.art_project }}
           # Collect VCS details from git and add them to the build
           jf rt bag
       
       - name: Push Image to Artifactory
-        run: |
-          jf docker push ${{ART_DOCKER_REGISTRY}}${{ART_DOCKER_IMAGE}} --server-id=$SERVER_ID --project=${{ART_PROJECT}}
+        run: jf docker push ${{ env.art_docker_registry }}${{ env.art_docker_image }} --server-id=${{ env.art_server_id }} --project=${{ env.art_project }}
       
       - name: Publish Build Info
-        run: |
-          jf rt bp --project=${{ART_PROJECT}}
+        run: jf rt bp --project=${{ env.art_project }}
