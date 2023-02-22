@@ -27,6 +27,18 @@ on:
         type: string
         default: "petclinic:latest"
         description: "Docker Image name:version"
+      xr_scan_type:
+        required: true
+        options:
+        - "project"
+        - "watch"
+        default: "project"
+        description: "Type of scan performed by XRAY"
+      xr_watch:
+        required: true
+        type: string
+        default: "carm-docker-all"
+        description: "XRAY watch"
 
 jobs:
   build:
@@ -69,8 +81,13 @@ jobs:
           load: true
           tags: ${{ github.event.inputs.art_docker_registry }}${{ github.event.inputs.art_docker_image }}
       
-      - name: Scan Docker Image for Vulnerabilities
+      - name: Scan Docker Image for Vulnerabilities (project)
+        if: ${{ github.event.inputs.xr_scan_type == 'project' }}
         run: jf docker scan ${{ github.event.inputs.art_docker_registry }}${{ github.event.inputs.art_docker_image }} --project=${{ github.event.inputs.art_project }}
+      
+      - name: Scan Docker Image for Vulnerabilities (watch)
+        if: ${{ github.event.inputs.xr_scan_type == 'watch' }}
+        run: jf docker scan ${{ github.event.inputs.art_docker_registry }}${{ github.event.inputs.art_docker_image }} --watches=${{ github.event.inputs.xr_watch }}
       
       - name: Collect Environment Variables
         run: |
