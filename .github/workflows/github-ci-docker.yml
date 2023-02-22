@@ -29,6 +29,7 @@ on:
         description: "Docker Image name:version"
       xr_scan_type:
         required: true
+        type: choice
         options:
         - "project"
         - "watch"
