@@ -46,6 +46,7 @@ on:
         options:
         - "false"
         - "true"
+        default: "false"
         description: "Set to false to not return the exit code 3, even if the 'Fail Build' rule is matched by Xray"
 
 jobs:
